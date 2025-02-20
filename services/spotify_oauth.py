@@ -1,22 +1,19 @@
-import requests
+import spotipy
+from spotipy.oauth2 import SpotifyOAuth
 
-class SpotifyOAuth:
-    def __init__(self, client_id, client_secret, redirect_uri):
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.redirect_uri = redirect_uri
+#le tue credenziali le trovi nella dashboard di prima
+SPOTIFY_CLIENT_ID = "3a9130b1a74740e4a1ef72b187a3d597"
+SPOTIFY_CLIENT_SECRET = "42089d774c5d4b3a9896fa6ff7e94ab1"
+SPOTIFY_REDIRECT_URI = "https://5000-minasiluca-spotipyrefac-aex9icopweb.ws-eu117.gitpod.io/callback" #dopo il login andiamo qui
 
-    def get_auth_url(self):
-        return f"https://accounts.spotify.com/authorize?client_id={self.client_id}&response_type=code&redirect_uri={self.redirect_uri}"
+#config SpotifyOAuth per l'autenticazione e redirect uri
+sp_oauth = SpotifyOAuth(
+    client_id=SPOTIFY_CLIENT_ID,
+    client_secret=SPOTIFY_CLIENT_SECRET,
+    redirect_uri=SPOTIFY_REDIRECT_URI,
+    scope="user-read-private", #permessi x informazioni dell'utente
+    show_dialog=True #forziamo la richiesta di inserire new credenziali
+)
 
-    def get_token(self, code):
-        url = "https://accounts.spotify.com/api/token"
-        data = {
-            'grant_type': 'authorization_code',
-            'code': code,
-            'redirect_uri': self.redirect_uri,
-            'client_id': self.client_id,
-            'client_secret': self.client_secret
-        }
-        response = requests.post(url, data=data)
-        return response.json()
+def get_spotify_object (token_info):
+    return spotipy.Spotify(auth=token_info['access_token'])
